@@ -1,0 +1,17 @@
+.message-input-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.message-input-container .ant-input-textarea {
+  border-radius: 8px;
+}
+
+.message-input-container .ant-btn {
+  border-radius: 8px;
+}
+
+.message-input-container textarea {
+  resize: none;
+}
