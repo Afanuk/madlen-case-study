@@ -14,7 +14,7 @@ function ModelSelector({ selectedModel, onModelChange }) {
 
   const fetchModels = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/models');
+      const response = await fetch('http://localhost:3000/api/models');
       if (!response.ok) {
         throw new Error('Failed to fetch models');
       }

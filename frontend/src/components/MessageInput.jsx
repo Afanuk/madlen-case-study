@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Input, Button, Space } from 'antd';
-import { SendOutlined, PlusOutlined } from '@ant-design/icons';
+import { SendOutlined } from '@ant-design/icons';
+import ModelSelector from './ModelSelector';
 import './MessageInput.css';
 
 const { TextArea } = Input;
 
-function MessageInput({ onSendMessage, disabled, onNewConversation }) {
+function MessageInput({ onSendMessage, disabled, onNewConversation, hasMessages, selectedModel, onModelChange }) {
   const [message, setMessage] = useState('');
 
   const handleSend = () => {
@@ -25,22 +26,19 @@ function MessageInput({ onSendMessage, disabled, onNewConversation }) {
   return (
     <div className="message-input-container">
       <Space.Compact style={{ width: '100%' }}>
-        <Button
-          icon={<PlusOutlined />}
-          onClick={onNewConversation}
-          disabled={disabled}
-          size="large"
-        >
-          New
-        </Button>
+        <ModelSelector
+          selectedModel={selectedModel}
+          onModelChange={onModelChange}
+        />
         <TextArea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Type your message... (Press Enter to send, Shift+Enter for new line)"
+          placeholder="Gemini'a sorun"
           disabled={disabled}
           autoSize={{ minRows: 1, maxRows: 4 }}
           size="large"
+          className="message-textarea"
         />
         <Button
           type="primary"
@@ -48,9 +46,8 @@ function MessageInput({ onSendMessage, disabled, onNewConversation }) {
           onClick={handleSend}
           disabled={disabled || !message.trim()}
           size="large"
-        >
-          Send
-        </Button>
+          className="send-btn"
+        />
       </Space.Compact>
     </div>
   );

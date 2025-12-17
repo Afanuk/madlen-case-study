@@ -1,17 +1,28 @@
 import { useState, useEffect } from 'react';
-import { Layout } from 'antd';
+import { Layout, Typography, Button } from 'antd';
+import { MenuOutlined } from '@ant-design/icons';
+import Sidebar from './Sidebar';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
-import ModelSelector from './ModelSelector';
 import './ChatInterface.css';
 
 const { Header, Content, Footer } = Layout;
+const { Title } = Typography;
 
 function ChatInterface() {
   const [messages, setMessages] = useState([]);
   const [selectedModel, setSelectedModel] = useState('openai/gpt-3.5-turbo');
   const [loading, setLoading] = useState(false);
   const [conversationId, setConversationId] = useState(null);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const hasMessages = messages.length > 0;
+
+  // Show sidebar when messages exist
+  useEffect(() => {
+    if (hasMessages) {
+      setSidebarVisible(true);
+    }
+  }, [hasMessages]);
 
   const handleSendMessage = async (messageText) => {
     if (!messageText.trim()) return;
@@ -26,7 +37,7 @@ function ChatInterface() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3001/api/chat', {
+      const response = await fetch('http://localhost:3000/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,27 +87,48 @@ function ChatInterface() {
   };
 
   return (
-    <Layout className="chat-interface">
-      <Header className="chat-header">
-        <div className="header-content">
-          <h1>Madlen Chat</h1>
-          <ModelSelector
+    <div className="app-container">
+      {sidebarVisible && <Sidebar onNewChat={handleNewConversation} />}
+      <Layout className="chat-interface">
+        {hasMessages && (
+          <Header className="chat-header">
+            <div className="header-content">
+              <Button 
+                type="text" 
+                icon={<MenuOutlined />} 
+                className="menu-btn"
+                onClick={() => setSidebarVisible(!sidebarVisible)}
+              />
+              <h1>Madlen</h1>
+              <div className="header-actions">
+                <span className="help-text">Yardım İsteği ve Teklif</span>
+              </div>
+            </div>
+          </Header>
+        )}
+        <Content className={`chat-content ${!hasMessages ? 'centered' : ''}`}>
+          {!hasMessages ? (
+            <div className="welcome-screen">
+              <div className="welcome-icon">✨</div>
+              <Title level={2} className="welcome-title">Merhaba Ahmet Faruk</Title>
+              <Title level={4} className="welcome-subtitle">Nereden başlayalım?</Title>
+            </div>
+          ) : (
+            <MessageList messages={messages} loading={loading} />
+          )}
+        </Content>
+        <Footer className="chat-footer">
+          <MessageInput
+            onSendMessage={handleSendMessage}
+            disabled={loading}
+            onNewConversation={handleNewConversation}
+            hasMessages={hasMessages}
             selectedModel={selectedModel}
             onModelChange={setSelectedModel}
           />
-        </div>
-      </Header>
-      <Content className="chat-content">
-        <MessageList messages={messages} loading={loading} />
-      </Content>
-      <Footer className="chat-footer">
-        <MessageInput
-          onSendMessage={handleSendMessage}
-          disabled={loading}
-          onNewConversation={handleNewConversation}
-        />
-      </Footer>
-    </Layout>
+        </Footer>
+      </Layout>
+    </div>
   );
 }
 

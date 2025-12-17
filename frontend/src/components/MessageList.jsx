@@ -1,6 +1,16 @@
 import { useEffect, useRef } from 'react';
-import { List, Avatar, Spin } from 'antd';
-import { UserOutlined, RobotOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { List, Avatar, Spin, Button, Dropdown } from 'antd';
+import { 
+  UserOutlined, 
+  RobotOutlined, 
+  ExclamationCircleOutlined,
+  LikeOutlined,
+  DislikeOutlined,
+  ReloadOutlined,
+  ShareAltOutlined,
+  MoreOutlined,
+  DownOutlined
+} from '@ant-design/icons';
 import './MessageList.css';
 
 function MessageList({ messages, loading }) {
@@ -35,30 +45,68 @@ function MessageList({ messages, loading }) {
     });
   };
 
+  const responseMenuItems = [
+    {
+      key: '1',
+      label: 'Düşünme sürecini göster',
+    },
+    {
+      key: '2', 
+      label: 'Daha kısa',
+    },
+    {
+      key: '3',
+      label: 'Daha uzun',
+    },
+    {
+      key: '4',
+      label: 'Daha basit',
+    },
+    {
+      key: '5',
+      label: 'Daha resmi',
+    },
+  ];
+
   return (
     <div className="message-list-container">
       <List
         className="message-list"
         dataSource={messages}
-        renderItem={(message) => (
-          <List.Item className={`message-item message-${message.role}`}>
-            <List.Item.Meta
-              avatar={getAvatar(message.role)}
-              title={
-                <div className="message-header">
-                  <span className="message-role">
-                    {message.role === 'user' ? 'You' : message.role === 'assistant' ? 'Assistant' : 'System'}
-                  </span>
-                  <span className="message-time">{formatTimestamp(message.timestamp)}</span>
+        renderItem={(message, index) => (
+          <div className="message-wrapper">
+            {message.role === 'user' && (
+              <div className="message-label">Merhaba</div>
+            )}
+            <List.Item className={`message-item message-${message.role}`}>
+              <div className="message-row">
+                {message.role === 'assistant' && (
+                  <Avatar className="message-avatar-icon">⭐</Avatar>
+                )}
+                <div className="message-body">
+                  <div className="message-content">
+                    {message.content}
+                  </div>
+                  {message.role === 'assistant' && (
+                    <>
+                      <div className="message-actions">
+                        <Button type="text" icon={<LikeOutlined />} className="action-btn" />
+                        <Button type="text" icon={<DislikeOutlined />} className="action-btn" />
+                        <Button type="text" icon={<ReloadOutlined />} className="action-btn" />
+                        <Button type="text" icon={<ShareAltOutlined />} className="action-btn" />
+                        <Button type="text" icon={<MoreOutlined />} className="action-btn" />
+                      </div>
+                      <Dropdown menu={{ items: responseMenuItems }} trigger={['click']}>
+                        <Button type="text" className="edit-response-btn">
+                          Düşünme sürecini göster <DownOutlined />
+                        </Button>
+                      </Dropdown>
+                    </>
+                  )}
                 </div>
-              }
-              description={
-                <div className="message-content">
-                  {message.content}
-                </div>
-              }
-            />
-          </List.Item>
+              </div>
+            </List.Item>
+          </div>
         )}
       />
       {loading && (
