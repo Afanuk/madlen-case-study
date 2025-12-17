@@ -13,7 +13,7 @@ export interface ChatRequest {
 }
 
 export interface ChatResponse {
-  response: string;
+  message: string;
   model: string;
   conversationId: string;
   timestamp: string;

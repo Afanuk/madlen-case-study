@@ -1,16 +1,13 @@
 import { useEffect, useRef } from 'react';
-import { List, Avatar, Spin, Button, Dropdown } from 'antd';
+import { List, Avatar, Spin, Button } from 'antd';
 import { 
-  UserOutlined, 
-  RobotOutlined, 
-  ExclamationCircleOutlined,
   LikeOutlined,
   DislikeOutlined,
   ReloadOutlined,
   ShareAltOutlined,
-  MoreOutlined,
-  DownOutlined
+  MoreOutlined
 } from '@ant-design/icons';
+import StreamingText from './StreamingText';
 import './MessageList.css';
 
 function MessageList({ messages, loading }) {
@@ -24,60 +21,13 @@ function MessageList({ messages, loading }) {
     scrollToBottom();
   }, [messages]);
 
-  const getAvatar = (role) => {
-    switch (role) {
-      case 'user':
-        return <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />;
-      case 'assistant':
-        return <Avatar icon={<RobotOutlined />} style={{ backgroundColor: '#52c41a' }} />;
-      case 'system':
-        return <Avatar icon={<ExclamationCircleOutlined />} style={{ backgroundColor: '#ff4d4f' }} />;
-      default:
-        return <Avatar icon={<UserOutlined />} />;
-    }
-  };
-
-  const formatTimestamp = (timestamp) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
-  };
-
-  const responseMenuItems = [
-    {
-      key: '1',
-      label: 'Düşünme sürecini göster',
-    },
-    {
-      key: '2', 
-      label: 'Daha kısa',
-    },
-    {
-      key: '3',
-      label: 'Daha uzun',
-    },
-    {
-      key: '4',
-      label: 'Daha basit',
-    },
-    {
-      key: '5',
-      label: 'Daha resmi',
-    },
-  ];
-
   return (
     <div className="message-list-container">
       <List
         className="message-list"
         dataSource={messages}
         renderItem={(message, index) => (
-          <div className="message-wrapper">
-            {message.role === 'user' && (
-              <div className="message-label">Merhaba</div>
-            )}
+          <div className={`message-wrapper message-${message.role}-wrapper`}>
             <List.Item className={`message-item message-${message.role}`}>
               <div className="message-row">
                 {message.role === 'assistant' && (
@@ -85,7 +35,14 @@ function MessageList({ messages, loading }) {
                 )}
                 <div className="message-body">
                   <div className="message-content">
-                    {message.content}
+                    {message.isStreaming ? (
+                      <StreamingText 
+                        text={message.fullContent || message.content} 
+                        delay={5}
+                      />
+                    ) : (
+                      message.content
+                    )}
                   </div>
                   {message.role === 'assistant' && (
                     <>
@@ -96,11 +53,6 @@ function MessageList({ messages, loading }) {
                         <Button type="text" icon={<ShareAltOutlined />} className="action-btn" />
                         <Button type="text" icon={<MoreOutlined />} className="action-btn" />
                       </div>
-                      <Dropdown menu={{ items: responseMenuItems }} trigger={['click']}>
-                        <Button type="text" className="edit-response-btn">
-                          Düşünme sürecini göster <DownOutlined />
-                        </Button>
-                      </Dropdown>
                     </>
                   )}
                 </div>

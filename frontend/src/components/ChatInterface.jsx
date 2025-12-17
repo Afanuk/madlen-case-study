@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Layout, Typography, Button } from 'antd';
+import { Layout, Typography, Button, message } from 'antd';
 import { MenuOutlined } from '@ant-design/icons';
 import Sidebar from './Sidebar';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
+import chatAPI from '../api/chat';
 import './ChatInterface.css';
 
 const { Header, Content, Footer } = Layout;
@@ -37,38 +38,31 @@ function ChatInterface() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3000/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: messageText,
-          model: selectedModel,
-          conversationId: conversationId,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send message');
-      }
-
-      const data = await response.json();
+      const data = await chatAPI.sendMessage(
+        messageText,
+        selectedModel,
+        conversationId
+      );
       
       // Update conversation ID if this is the first message
       if (!conversationId && data.conversationId) {
         setConversationId(data.conversationId);
       }
 
-      // Add assistant message
+      // Add assistant message with streaming flag
       const assistantMessage = {
         role: 'assistant',
         content: data.message,
+        fullContent: data.message,
         timestamp: new Date().toISOString(),
+        isStreaming: true,
       };
       setMessages((prev) => [...prev, assistantMessage]);
+      setLoading(false);
     } catch (error) {
       console.error('Error sending message:', error);
+      message.error('Failed to send message. Please try again.');
+      
       // Add error message to chat
       const errorMessage = {
         role: 'system',
@@ -76,7 +70,6 @@ function ChatInterface() {
         timestamp: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, errorMessage]);
-    } finally {
       setLoading(false);
     }
   };
@@ -100,9 +93,6 @@ function ChatInterface() {
                 onClick={() => setSidebarVisible(!sidebarVisible)}
               />
               <h1>Madlen</h1>
-              <div className="header-actions">
-                <span className="help-text">Yardım İsteği ve Teklif</span>
-              </div>
             </div>
           </Header>
         )}

@@ -6,7 +6,7 @@ import './MessageInput.css';
 
 const { TextArea } = Input;
 
-function MessageInput({ onSendMessage, disabled, onNewConversation, hasMessages, selectedModel, onModelChange }) {
+function MessageInput({ onSendMessage, disabled, selectedModel, onModelChange }) {
   const [message, setMessage] = useState('');
 
   const handleSend = () => {

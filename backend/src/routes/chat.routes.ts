@@ -67,9 +67,9 @@ router.post('/chat', async (req: Request, res: Response) => {
 
     // Create response
     const response: ChatResponse = {
-      response: assistantText,
+      message: assistantText,
       model: openRouterResponse.model,
-      conversationId: conversationId || `conv_${Date.now()}`,
+      conversationId: conversation.id,
       timestamp: new Date().toISOString(),
     };
 

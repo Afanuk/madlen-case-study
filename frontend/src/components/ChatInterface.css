@@ -44,17 +44,6 @@
   flex: 1;
 }
 
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.help-text {
-  color: #9aa0a6;
-  font-size: 14px;
-}
-
 .chat-content {
   flex: 1;
   overflow: hidden;
@@ -99,12 +88,6 @@
   font-size: 22px !important;
   font-weight: 300 !important;
   margin-bottom: 32px !important;
-}
-
-.model-selector-centered {
-  margin-bottom: 48px;
-  display: flex;
-  justify-content: center;
 }
 
 .chat-footer {

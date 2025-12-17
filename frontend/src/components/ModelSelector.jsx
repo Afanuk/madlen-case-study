@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Select, message } from 'antd';
+import chatAPI from '../api/chat';
 import './ModelSelector.css';
 
 const { Option } = Select;
@@ -14,11 +15,7 @@ function ModelSelector({ selectedModel, onModelChange }) {
 
   const fetchModels = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/models');
-      if (!response.ok) {
-        throw new Error('Failed to fetch models');
-      }
-      const data = await response.json();
+      const data = await chatAPI.getModels();
       setModels(data.models);
     } catch (error) {
       console.error('Error fetching models:', error);

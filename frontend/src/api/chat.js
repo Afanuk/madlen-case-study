@@ -1,8 +1,24 @@
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+
+// Retry logic for failed requests
+const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: AbortSignal.timeout(10000), // 10 second timeout
+      });
+      return response;
+    } catch (error) {
+      if (i === retries - 1) throw error;
+      await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+    }
+  }
+};
 
 export const chatAPI = {
   async sendMessage(message, model, conversationId = null) {
-    const response = await fetch(`${API_BASE_URL}/chat`, {
+    const response = await fetchWithRetry(`${API_BASE_URL}/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -15,14 +31,15 @@ export const chatAPI = {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to send message: ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Failed to send message: ${response.statusText}`);
     }
 
     return response.json();
   },
 
   async getModels() {
-    const response = await fetch(`${API_BASE_URL}/models`);
+    const response = await fetchWithRetry(`${API_BASE_URL}/models`);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch models: ${response.statusText}`);
@@ -32,7 +49,7 @@ export const chatAPI = {
   },
 
   async getConversations() {
-    const response = await fetch(`${API_BASE_URL}/conversations`);
+    const response = await fetchWithRetry(`${API_BASE_URL}/conversations`);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch conversations: ${response.statusText}`);
@@ -42,7 +59,7 @@ export const chatAPI = {
   },
 
   async getConversation(conversationId) {
-    const response = await fetch(`${API_BASE_URL}/conversations/${conversationId}`);
+    const response = await fetchWithRetry(`${API_BASE_URL}/conversations/${conversationId}`);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch conversation: ${response.statusText}`);
