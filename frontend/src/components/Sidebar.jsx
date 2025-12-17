@@ -5,7 +5,13 @@ import {
 } from '@ant-design/icons';
 import './Sidebar.css';
 
-function Sidebar({ onNewChat, conversations }) {
+function Sidebar({ onNewChat, conversations, currentConversationId, onSwitchConversation }) {
+  const getConversationTitle = (conv) => {
+    // Use first user message as title (truncated)
+    if (!conv || !conv.id) return 'Yeni Sohbet';
+    return `Sohbet ${conv.id.split('_')[1]?.slice(-4) || ''}`;
+  };
+
   return (
     <div className="sidebar">
       <div className="sidebar-header">
@@ -24,16 +30,19 @@ function Sidebar({ onNewChat, conversations }) {
         <div className="menu-section">
           <div className="menu-section-title">Sohbetler</div>
           {conversations && conversations.length > 0 ? (
-            conversations.map((conv, idx) => (
-              <div key={idx} className="conversation-item">
+            conversations.map((conv) => (
+              <div 
+                key={conv.id} 
+                className={`conversation-item ${conv.id === currentConversationId ? 'selected' : ''}`}
+                onClick={() => onSwitchConversation(conv.id)}
+              >
                 <ClockCircleOutlined />
-                <span>{conv.title || `Yardım İsteği ve Teklif`}</span>
+                <span>{getConversationTitle(conv)}</span>
               </div>
             ))
           ) : (
-            <div className="conversation-item selected">
-              <ClockCircleOutlined />
-              <span>Yardım İsteği ve Teklif</span>
+            <div className="conversation-item-empty">
+              <span>Henüz sohbet yok</span>
             </div>
           )}
         </div>

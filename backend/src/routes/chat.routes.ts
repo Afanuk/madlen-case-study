@@ -42,15 +42,16 @@ router.post('/chat', async (req: Request, res: Response) => {
       conversation = conversationService.createConversation(model, userMessage);
     }
     
-    // Call OpenRouter API
+    // Prepare conversation history for OpenRouter (map to OpenRouter format)
+    const conversationHistory = conversation.messages.map(msg => ({
+      role: msg.role,
+      content: msg.content,
+    }));
+    
+    // Call OpenRouter API with full conversation history
     const openRouterResponse = await getOpenRouterService().sendChatCompletion({
       model,
-      messages: [
-        {
-          role: 'user',
-          content: message,
-        },
-      ],
+      messages: conversationHistory,
     });
 
     // Extract response

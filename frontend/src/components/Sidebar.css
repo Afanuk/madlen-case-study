@@ -84,6 +84,13 @@
   white-space: nowrap;
 }
 
+.conversation-item-empty {
+  padding: 10px 12px;
+  color: #9aa0a6;
+  font-size: 13px;
+  text-align: center;
+}
+
 .sidebar-footer {
   padding: 8px 0;
   border-top: 1px solid #2d2d2d;

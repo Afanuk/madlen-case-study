@@ -16,6 +16,7 @@ function ChatInterface() {
   const [loading, setLoading] = useState(false);
   const [conversationId, setConversationId] = useState(null);
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [conversations, setConversations] = useState([]);
   const hasMessages = messages.length > 0;
 
   // Show sidebar when messages exist
@@ -24,6 +25,20 @@ function ChatInterface() {
       setSidebarVisible(true);
     }
   }, [hasMessages]);
+
+  // Fetch conversations on mount and when conversation changes
+  useEffect(() => {
+    fetchConversations();
+  }, [conversationId]);
+
+  const fetchConversations = async () => {
+    try {
+      const data = await chatAPI.getConversations();
+      setConversations(data.conversations || []);
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+    }
+  };
 
   const handleSendMessage = async (messageText) => {
     if (!messageText.trim()) return;
@@ -79,9 +94,30 @@ function ChatInterface() {
     setConversationId(null);
   };
 
+  const handleSwitchConversation = async (convId) => {
+    try {
+      const data = await chatAPI.getConversation(convId);
+      if (data.conversation) {
+        setMessages(data.conversation.messages);
+        setConversationId(convId);
+        setSelectedModel(data.conversation.meta.model);
+      }
+    } catch (error) {
+      console.error('Error switching conversation:', error);
+      message.error('Failed to load conversation.');
+    }
+  };
+
   return (
     <div className="app-container">
-      {sidebarVisible && <Sidebar onNewChat={handleNewConversation} />}
+      {sidebarVisible && (
+        <Sidebar 
+          onNewChat={handleNewConversation} 
+          conversations={conversations}
+          currentConversationId={conversationId}
+          onSwitchConversation={handleSwitchConversation}
+        />
+      )}
       <Layout className="chat-interface">
         {hasMessages && (
           <Header className="chat-header">
