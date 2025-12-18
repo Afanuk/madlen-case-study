@@ -1,5 +1,6 @@
 import { trace, SpanStatusCode } from '@opentelemetry/api';
-import { Conversation, ConversationMeta, Message } from "../types";
+import { Conversation, ConversationMeta } from "../types/conversation";
+import { Message } from '../types/message';
 
 const tracer = trace.getTracer('conversation-service');
 

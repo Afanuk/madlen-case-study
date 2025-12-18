@@ -1,7 +1,8 @@
 import { Router, Request, Response } from 'express';
 import { OpenRouterService } from '../services/openrouter.service';
 import { conversationService } from '../services/conversation.service';
-import { ChatRequest, ChatResponse, Message } from '../types';
+import { ChatRequest, ChatResponse } from '../types/chat';
+import { Message } from '../types/message';
 import { upload } from '../middleware/upload';
 
 const router = Router();

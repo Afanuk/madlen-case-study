@@ -24,32 +24,50 @@
   position: relative;
   display: inline-block;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.image-preview-wrapper .ant-image {
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .remove-image-btn {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #1f1f1f !important;
-  border: 1px solid #3c4043 !important;
+  top: -10px;
+  right: -10px;
+  background: #ff4d4f !important;
+  border: 2px solid #1f1f1f !important;
   border-radius: 50% !important;
-  width: 28px !important;
-  height: 28px !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
   padding: 0 !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #e8eaed !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
   transition: all 0.2s ease;
+  z-index: 10;
+  cursor: pointer;
+  line-height: 1 !important;
+}
+
+.remove-image-btn .anticon {
+  font-size: 14px !important;
+  line-height: 1 !important;
 }
 
 .remove-image-btn:hover {
-  background: #ff4d4f !important;
-  border-color: #ff4d4f !important;
-  transform: scale(1.1);
+  background: #ff7875 !important;
+  border-color: #1f1f1f !important;
+  transform: scale(1.15);
+  box-shadow: 0 6px 12px rgba(255, 77, 79, 0.4);
 }
 
 .image-upload-btn {

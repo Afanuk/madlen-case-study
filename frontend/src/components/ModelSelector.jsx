@@ -41,7 +41,6 @@ function ModelSelector({ selectedModel, onModelChange }) {
         style={{ minWidth: 250 }}
         size="large"
         placeholder="Select a model"
-        suffixIcon={<RobotOutlined />}
       >
         {models.map((model) => (
           <Option key={model.id} value={model.id}>

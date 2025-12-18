@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { trace, context, SpanStatusCode } from '@opentelemetry/api';
-import { OpenRouterRequest, OpenRouterResponse, Model } from '../types';
+import { OpenRouterRequest, OpenRouterResponse } from '../types/openrouter';
+import { Model } from '../types/model';
 
 const tracer = trace.getTracer('openrouter-service');
 
