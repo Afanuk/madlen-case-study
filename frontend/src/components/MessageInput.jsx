@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Input, Button, Space } from 'antd';
-import { SendOutlined } from '@ant-design/icons';
+import { useState, useRef } from 'react';
+import { Input, Button, Space, Image, message as antMessage } from 'antd';
+import { SendOutlined, PictureOutlined, CloseOutlined } from '@ant-design/icons';
 import ModelSelector from './ModelSelector';
 import './MessageInput.css';
 
@@ -8,11 +8,16 @@ const { TextArea } = Input;
 
 function MessageInput({ onSendMessage, disabled, selectedModel, onModelChange }) {
   const [message, setMessage] = useState('');
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const fileInputRef = useRef(null);
 
   const handleSend = () => {
-    if (message.trim()) {
-      onSendMessage(message);
+    if (message.trim() || imageFile) {
+      onSendMessage(message, imageFile);
       setMessage('');
+      setImageFile(null);
+      setImagePreview(null);
     }
   };
 
@@ -23,18 +28,88 @@ function MessageInput({ onSendMessage, disabled, selectedModel, onModelChange })
     }
   };
 
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        antMessage.error('Lütfen sadece resim dosyası yükleyin');
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        antMessage.error('Resim boyutu 5MB\'dan küçük olmalıdır');
+        return;
+      }
+
+      setImageFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="message-input-container">
+      {imagePreview && (
+        <div className="image-preview-container">
+          <div className="image-preview-wrapper">
+            <Image
+              src={imagePreview}
+              alt="Preview"
+              width={100}
+              height={100}
+              style={{ objectFit: 'cover', borderRadius: '8px' }}
+            />
+            <Button
+              type="text"
+              icon={<CloseOutlined />}
+              onClick={handleRemoveImage}
+              className="remove-image-btn"
+              size="small"
+            />
+          </div>
+        </div>
+      )}
       <Space.Compact style={{ width: '100%' }}>
         <ModelSelector
           selectedModel={selectedModel}
           onModelChange={onModelChange}
         />
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleImageSelect}
+          style={{ display: 'none' }}
+        />
+        <Button
+          type="text"
+          icon={<PictureOutlined />}
+          onClick={() => fileInputRef.current?.click()}
+          disabled={disabled}
+          size="large"
+          className="image-upload-btn"
+          title="Resim ekle"
+        />
         <TextArea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Gemini'a sorun"
+          placeholder="Madlen'a sorun"
           disabled={disabled}
           autoSize={{ minRows: 1, maxRows: 4 }}
           size="large"
@@ -44,7 +119,7 @@ function MessageInput({ onSendMessage, disabled, selectedModel, onModelChange })
           type="primary"
           icon={<SendOutlined />}
           onClick={handleSend}
-          disabled={disabled || !message.trim()}
+          disabled={disabled || (!message.trim() && !imageFile)}
           size="large"
           className="send-btn"
         />

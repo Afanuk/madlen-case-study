@@ -40,8 +40,8 @@ function ChatInterface() {
     }
   };
 
-  const handleSendMessage = async (messageText) => {
-    if (!messageText.trim()) return;
+  const handleSendMessage = async (messageText, imageFile = null) => {
+    if (!messageText.trim() && !imageFile) return;
 
     // Add user message to UI immediately
     const userMessage = {
@@ -49,14 +49,27 @@ function ChatInterface() {
       content: messageText,
       timestamp: new Date().toISOString(),
     };
-    setMessages((prev) => [...prev, userMessage]);
+    
+    // Add image preview if image was uploaded
+    if (imageFile) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        userMessage.image = reader.result;
+        setMessages((prev) => [...prev, userMessage]);
+      };
+      reader.readAsDataURL(imageFile);
+    } else {
+      setMessages((prev) => [...prev, userMessage]);
+    }
+    
     setLoading(true);
 
     try {
       const data = await chatAPI.sendMessage(
         messageText,
         selectedModel,
-        conversationId
+        conversationId,
+        imageFile
       );
       
       // Update conversation ID if this is the first message
@@ -77,11 +90,20 @@ function ChatInterface() {
     } catch (error) {
       console.error('Error sending message:', error);
       message.error('Failed to send message. Please try again.');
+
+      console.log(error.message);
       
+      let contentMessage = 'Failed to send message. Please try again.';
+      if (error.message.includes('This request requires more credits,')) {
+        contentMessage = 'This request requires more credits, please top up your account or use a different model.';
+      } else if (error.message.includes('No endpoints found that support image input')) {
+        contentMessage = 'The selected model does not support image input. Please choose a different model.';
+      }
+
       // Add error message to chat
       const errorMessage = {
         role: 'system',
-        content: 'Failed to send message. Please try again.',
+        content: contentMessage,
         timestamp: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, errorMessage]);

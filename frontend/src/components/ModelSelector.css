@@ -1,25 +1,28 @@
 .model-selector {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
+  background-color: #2d2d2d;
+  color: #2d2d2d;
+  border: none;
 }
 
 .model-selector .ant-select {
   min-width: 180px !important;
-  max-width: 200px !important;
+  max-width: 220px !important;
+  background-color: #2d2d2d !important;
+  color: #edeae8 !important;
+  border-radius: 100px !important;
+  border-color: #9aa0a6 !important;
 }
 
-.model-selector .ant-select-selector {
-  border-radius: 24px !important;
-  background: #1f1f1f !important;
-  border: 1px solid #3c4043 !important;
-  color: #e8eaed !important;
-  height: 40px !important;
-  display: flex;
-  align-items: center;
-}
-
-.model-selector .ant-select-selector:hover {
-  border-color: #5f6368 !important;
+.model-selector .ant-select:focus .ant-select:hover {
+  min-width: 180px !important;
+  max-width: 220px !important;
+  background-color: #2d2d2d !important;
+  color: #9aa0a6 !important;
+  border-radius: 100px !important;
+  border-color: #9aa0a6 !important;
 }
 
 .model-selector .ant-select-arrow {
@@ -27,6 +30,8 @@
 }
 
 .model-selector .ant-select-selection-item {
-  color: #e8eaed !important;
+  color: #edeae8 !important;
   line-height: 38px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
 }

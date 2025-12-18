@@ -43,6 +43,24 @@
   padding: 0 4px;
 }
 
+/* Scrollbar styling */
+.sidebar-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb {
+  background: #3c4043;
+  border-radius: 4px;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb:hover {
+  background: #5f6368;
+}
+
 .menu-section {
   margin-bottom: 24px;
 }

@@ -8,7 +8,18 @@ import './Sidebar.css';
 function Sidebar({ onNewChat, conversations, currentConversationId, onSwitchConversation }) {
   const getConversationTitle = (conv) => {
     // Use first user message as title (truncated)
-    if (!conv || !conv.id) return 'Yeni Sohbet';
+    if (!conv || !conv.messages || conv.messages.length === 0) {
+      return 'Yeni Sohbet';
+    }
+    
+    // Find first user message
+    const firstUserMessage = conv.messages.find(msg => msg.role === 'user');
+    if (firstUserMessage && firstUserMessage.content) {
+      // Truncate to 30 characters
+      const text = firstUserMessage.content.trim();
+      return text.length > 30 ? text.substring(0, 30) + '...' : text;
+    }
+    
     return `Sohbet ${conv.id.split('_')[1]?.slice(-4) || ''}`;
   };
 

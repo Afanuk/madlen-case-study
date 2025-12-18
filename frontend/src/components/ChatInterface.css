@@ -20,10 +20,10 @@
 
 .header-content {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 16px;
   max-width: 900px;
-  margin: 0 auto;
+  margin: 0;
   width: 100%;
 }
 
@@ -92,6 +92,8 @@
 
 .chat-footer {
   background: #131314;
-  padding: 16px 24px 24px;
-  border-top: 1px solid #2d2d2d;
+  box-shadow: 0 -40px 70px #131314;
+  padding: 0px 24px 64px;
+  position: relative;
+  z-index: 10;
 }

@@ -17,17 +17,35 @@ const fetchWithRetry = async (url, options = {}, retries = 3, delay = 1000) => {
 };
 
 export const chatAPI = {
-  async sendMessage(message, model, conversationId = null) {
-    const response = await fetchWithRetry(`${API_BASE_URL}/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+  async sendMessage(message, model, conversationId = null, imageFile = null) {
+    let body;
+    let headers = {};
+
+    if (imageFile) {
+      // Use FormData for multipart/form-data when image is present
+      const formData = new FormData();
+      formData.append('message', message);
+      formData.append('model', model);
+      if (conversationId) {
+        formData.append('conversationId', conversationId);
+      }
+      formData.append('image', imageFile);
+      body = formData;
+      // Don't set Content-Type header, let browser set it with boundary
+    } else {
+      // Use JSON for text-only messages
+      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify({
         message,
         model,
         conversationId,
-      }),
+      });
+    }
+
+    const response = await fetchWithRetry(`${API_BASE_URL}/chat`, {
+      method: 'POST',
+      headers,
+      body,
     });
 
     if (!response.ok) {

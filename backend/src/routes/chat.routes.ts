@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { OpenRouterService } from '../services/openrouter.service';
 import { conversationService } from '../services/conversation.service';
 import { ChatRequest, ChatResponse, Message } from '../types';
+import { upload } from '../middleware/upload';
 
 const router = Router();
 let openRouterService: OpenRouterService;
@@ -16,22 +17,26 @@ const getOpenRouterService = () => {
 
 /**
  * POST /api/chat
- * Send a message and get AI response
+ * Send a message and get AI response (with optional image)
  */
-router.post('/chat', async (req: Request, res: Response) => {
+router.post('/chat', upload.single('image'), async (req: Request, res: Response) => {
   try {
-    const { message, model, conversationId } = req.body as ChatRequest;
+    const { message, model, conversationId } = req.body;
+    const imageFile = req.file;
 
     // Validate request
-    if (!message || !model) {
-      return res.status(400).json({ error: 'Missing required fields: message and model' });
+    if ((!message || message.trim() === '') && !imageFile) {
+      return res.status(400).json({ error: 'Message or image is required' });
+    }
+    if (!model) {
+      return res.status(400).json({ error: 'Model is required' });
     }
 
     // If conversationId is provided, add message to existing conversation
     let conversation;
     const userMessage: Message = {
       role: 'user',
-      content: message,
+      content: message || '[Image]',
       timestamp: new Date().toISOString(),
     };
 
@@ -42,11 +47,38 @@ router.post('/chat', async (req: Request, res: Response) => {
       conversation = conversationService.createConversation(model, userMessage);
     }
     
-    // Prepare conversation history for OpenRouter (map to OpenRouter format)
-    const conversationHistory = conversation.messages.map(msg => ({
-      role: msg.role,
-      content: msg.content,
-    }));
+    // Prepare conversation history for OpenRouter
+    const conversationHistory = conversation.messages.map(msg => {
+      // For now, only send text content in history (images only in current message)
+      return {
+        role: msg.role,
+        content: msg.content,
+      };
+    });
+    
+    // If image is present, modify the last user message to include image
+    if (imageFile) {
+      // Convert image to base64
+      const base64Image = imageFile.buffer.toString('base64');
+      const mimeType = imageFile.mimetype;
+      
+      // Update last message to include image in OpenRouter format
+      conversationHistory[conversationHistory.length - 1] = {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: message || 'What is in this image?',
+          },
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:${mimeType};base64,${base64Image}`,
+            },
+          },
+        ] as any,
+      };
+    }
     
     // Call OpenRouter API with full conversation history
     const openRouterResponse = await getOpenRouterService().sendChatCompletion({
@@ -114,7 +146,12 @@ router.get('/models', async (req: Request, res: Response) => {
 router.get('/conversations', async (req: Request, res: Response) => {
   try {
     const conversationList = conversationService.listConversations();
-    res.json({ conversations: conversationList });
+    // Include full conversation data with messages for better titles
+    const fullConversations = conversationList.map(meta => {
+      const conv = conversationService.getConversation(meta.id);
+      return conv;
+    }).filter(conv => conv !== null);
+    res.json({ conversations: fullConversations });
   } catch (error) {
     console.error('Conversation list fetch error:', error);
     res.status(500).json({ error: 'Failed to fetch conversations' });

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Select, message } from 'antd';
+import { RobotOutlined } from '@ant-design/icons';
 import chatAPI from '../api/chat';
 import './ModelSelector.css';
 
@@ -40,6 +41,7 @@ function ModelSelector({ selectedModel, onModelChange }) {
         style={{ minWidth: 250 }}
         size="large"
         placeholder="Select a model"
+        suffixIcon={<RobotOutlined />}
       >
         {models.map((model) => (
           <Option key={model.id} value={model.id}>

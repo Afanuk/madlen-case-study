@@ -1,28 +1,33 @@
 import { useEffect, useRef } from 'react';
-import { List, Avatar, Spin, Button } from 'antd';
-import { 
-  LikeOutlined,
-  DislikeOutlined,
-  ReloadOutlined,
-  ShareAltOutlined,
-  MoreOutlined
-} from '@ant-design/icons';
+import { List, Avatar, Spin, Image } from 'antd';
 import StreamingText from './StreamingText';
 import './MessageList.css';
 
 function MessageList({ messages, loading }) {
-  const messagesEndRef = useRef(null);
+  const containerRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
     scrollToBottom();
+  }, [messages, loading]);
+
+  // Also scroll during streaming updates
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (messages.some(m => m.isStreaming)) {
+        scrollToBottom();
+      }
+    }, 100);
+    return () => clearInterval(timer);
   }, [messages]);
 
   return (
-    <div className="message-list-container">
+    <div className="message-list-container" ref={containerRef}>
       <List
         className="message-list"
         dataSource={messages}
@@ -34,6 +39,16 @@ function MessageList({ messages, loading }) {
                   <Avatar className="message-avatar-icon">⭐</Avatar>
                 )}
                 <div className="message-body">
+                  {message.image && (
+                    <div className="message-image">
+                      <Image
+                        src={message.image}
+                        alt="Uploaded"
+                        width={200}
+                        style={{ borderRadius: '8px', marginBottom: '8px' }}
+                      />
+                    </div>
+                  )}
                   <div className="message-content">
                     {message.isStreaming ? (
                       <StreamingText 
@@ -44,17 +59,6 @@ function MessageList({ messages, loading }) {
                       message.content
                     )}
                   </div>
-                  {message.role === 'assistant' && (
-                    <>
-                      <div className="message-actions">
-                        <Button type="text" icon={<LikeOutlined />} className="action-btn" />
-                        <Button type="text" icon={<DislikeOutlined />} className="action-btn" />
-                        <Button type="text" icon={<ReloadOutlined />} className="action-btn" />
-                        <Button type="text" icon={<ShareAltOutlined />} className="action-btn" />
-                        <Button type="text" icon={<MoreOutlined />} className="action-btn" />
-                      </div>
-                    </>
-                  )}
                 </div>
               </div>
             </List.Item>
@@ -67,7 +71,6 @@ function MessageList({ messages, loading }) {
           <span style={{ marginLeft: '8px' }}>Assistant is typing...</span>
         </div>
       )}
-      <div ref={messagesEndRef} />
     </div>
   );
 }
