@@ -38,9 +38,10 @@ function ModelSelector({ selectedModel, onModelChange }) {
         value={selectedModel}
         onChange={onModelChange}
         loading={loading}
-        style={{ minWidth: 250 }}
-        size="large"
+        style={{ minWidth: 220 }}
+        size="middle"
         placeholder="Select a model"
+        dropdownStyle={{ minWidth: 250 }}
       >
         {models.map((model) => (
           <Option key={model.id} value={model.id}>

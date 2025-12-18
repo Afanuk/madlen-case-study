@@ -12,17 +12,20 @@
   max-width: 220px !important;
   background-color: #2d2d2d !important;
   color: #edeae8 !important;
-  border-radius: 100px !important;
-  border-color: #9aa0a6 !important;
+  border: none !important;
 }
 
 .model-selector .ant-select:focus .ant-select:hover {
   min-width: 180px !important;
   max-width: 220px !important;
   background-color: #2d2d2d !important;
-  color: #9aa0a6 !important;
+  color: #edeae8 !important;
   border-radius: 100px !important;
   border-color: #9aa0a6 !important;
+}
+
+.model-selector .ant-select-content-value {
+  color: #edeae8 !important;
 }
 
 .model-selector .ant-select-arrow {

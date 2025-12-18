@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
-import { Input, Button, Space, Image, message as antMessage } from 'antd';
-import { SendOutlined, PictureOutlined, CloseOutlined } from '@ant-design/icons';
+import { Input, Button, Space, Image, message as antMessage, Dropdown } from 'antd';
+import { SendOutlined, PictureOutlined, CloseOutlined, MoreOutlined, RobotOutlined } from '@ant-design/icons';
 import ModelSelector from './ModelSelector';
 import './MessageInput.css';
 
@@ -10,6 +10,7 @@ function MessageInput({ onSendMessage, disabled, selectedModel, onModelChange })
   const [message, setMessage] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleSend = () => {
@@ -62,6 +63,38 @@ function MessageInput({ onSendMessage, disabled, selectedModel, onModelChange })
     }
   };
 
+  const handleImageUploadClick = () => {
+    setDropdownOpen(false);
+    fileInputRef.current?.click();
+  };
+
+  const menuItems = [
+    {
+      key: 'model',
+      icon: <RobotOutlined />,
+      label: (
+        <div onClick={(e) => e.stopPropagation()}>
+          <ModelSelector
+            selectedModel={selectedModel}
+            onModelChange={(value) => {
+              onModelChange(value);
+              setDropdownOpen(false);
+            }}
+          />
+        </div>
+      ),
+    },
+    {
+      type: 'divider',
+    },
+    {
+      key: 'image',
+      icon: <PictureOutlined />,
+      label: 'Upload Image',
+      onClick: handleImageUploadClick,
+    },
+  ];
+
   return (
     <div className="message-input-container">
       {imagePreview && (
@@ -85,10 +118,6 @@ function MessageInput({ onSendMessage, disabled, selectedModel, onModelChange })
         </div>
       )}
       <Space.Compact style={{ width: '100%' }}>
-        <ModelSelector
-          selectedModel={selectedModel}
-          onModelChange={onModelChange}
-        />
         <input
           ref={fileInputRef}
           type="file"
@@ -96,15 +125,23 @@ function MessageInput({ onSendMessage, disabled, selectedModel, onModelChange })
           onChange={handleImageSelect}
           style={{ display: 'none' }}
         />
-        <Button
-          type="text"
-          icon={<PictureOutlined />}
-          onClick={() => fileInputRef.current?.click()}
-          disabled={disabled}
-          size="large"
-          className="image-upload-btn"
-          title="Resim ekle"
-        />
+        <Dropdown
+          menu={{ items: menuItems }}
+          trigger={['click']}
+          open={dropdownOpen}
+          onOpenChange={setDropdownOpen}
+          placement="topLeft"
+          overlayClassName="more-actions-dropdown"
+        >
+          <Button
+            type="text"
+            icon={<MoreOutlined />}
+            disabled={disabled}
+            size="large"
+            className="more-actions-btn"
+            title="More actions"
+          />
+        </Dropdown>
         <TextArea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
