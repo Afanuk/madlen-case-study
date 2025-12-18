@@ -1,5 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
+import { trace, context, SpanStatusCode } from '@opentelemetry/api';
 import { OpenRouterRequest, OpenRouterResponse, Model } from '../types';
+
+const tracer = trace.getTracer('openrouter-service');
 
 export class OpenRouterService {
   private client: AxiosInstance;
@@ -27,48 +30,85 @@ export class OpenRouterService {
    * Send a chat completion request to OpenRouter
    */
   async sendChatCompletion(request: OpenRouterRequest): Promise<OpenRouterResponse> {
-    try {
-      const response = await this.client.post<OpenRouterResponse>(
-        '/chat/completions',
-        request
-      );
-      return response.data;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new Error(
-          `OpenRouter API Error: ${error.response?.data?.error?.message || error.message}`
+    return tracer.startActiveSpan('openrouter.chat_completion', async (span) => {
+      try {
+        // Add span attributes for observability
+        span.setAttribute('openrouter.model', request.model);
+        span.setAttribute('openrouter.message_count', request.messages.length);
+        
+        const startTime = Date.now();
+        const response = await this.client.post<OpenRouterResponse>(
+          '/chat/completions',
+          request
         );
+        const duration = Date.now() - startTime;
+        
+        // Record successful completion
+        span.setAttribute('openrouter.response_model', response.data.model);
+        span.setAttribute('openrouter.duration_ms', duration);
+        span.setStatus({ code: SpanStatusCode.OK });
+        
+        return response.data;
+      } catch (error) {
+        // Record error in span
+        span.recordException(error as Error);
+        span.setStatus({ 
+          code: SpanStatusCode.ERROR,
+          message: error instanceof Error ? error.message : 'Unknown error'
+        });
+        
+        if (axios.isAxiosError(error)) {
+          span.setAttribute('openrouter.error_status', error.response?.status || 0);
+          throw new Error(
+            `OpenRouter API Error: ${error.response?.data?.error?.message || error.message}`
+          );
+        }
+        throw error;
+      } finally {
+        span.end();
       }
-      throw error;
-    }
+    });
   }
 
   /**
    * Get available models from OpenRouter
    */
   async getAvailableModels(): Promise<Model[]> {
-    try {
-      const response = await this.client.get('/models');
-      const models = response.data.data || [];
-      
-      // Return formatted models with essential info
-      return models.map((model: any) => ({
-        id: model.id,
-        name: model.name || model.id,
-        description: model.description,
-        pricing: model.pricing ? {
-          prompt: model.pricing.prompt,
-          completion: model.pricing.completion,
-        } : undefined,
-      }));
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new Error(
-          `Failed to fetch models: ${error.response?.data?.error?.message || error.message}`
-        );
+    return tracer.startActiveSpan('openrouter.get_models', async (span) => {
+      try {
+        const response = await this.client.get('/models');
+        const models = response.data.data || [];
+        
+        span.setAttribute('openrouter.models_count', models.length);
+        span.setStatus({ code: SpanStatusCode.OK });
+        
+        // Return formatted models with essential info
+        return models.map((model: any) => ({
+          id: model.id,
+          name: model.name || model.id,
+          description: model.description,
+          pricing: model.pricing ? {
+            prompt: model.pricing.prompt,
+            completion: model.pricing.completion,
+          } : undefined,
+        }));
+      } catch (error) {
+        span.recordException(error as Error);
+        span.setStatus({ 
+          code: SpanStatusCode.ERROR,
+          message: error instanceof Error ? error.message : 'Failed to fetch models'
+        });
+        
+        if (axios.isAxiosError(error)) {
+          throw new Error(
+            `Failed to fetch models: ${error.response?.data?.error?.message || error.message}`
+          );
+        }
+        throw error;
+      } finally {
+        span.end();
       }
-      throw error;
-    }
+    });
   }
 
   /**
