@@ -5,6 +5,7 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import chatRoutes from './routes/chat.routes';
+import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
 
@@ -25,6 +26,9 @@ app.get('/health', (req: Request, res: Response) => {
 
 // API Routes
 app.use('/api', chatRoutes);
+
+// Error handling middleware - should be the last middleware
+app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
