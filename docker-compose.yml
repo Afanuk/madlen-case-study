@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: madlen-jaeger
+    ports:
+      # Jaeger UI - Web interface for viewing traces
+      - "16686:16686"
+      # OTLP HTTP receiver - Where backend sends traces
+      - "4318:4318"
+      # OTLP gRPC receiver (optional)
+      - "4317:4317"
+      # Jaeger agent (optional, for legacy collectors)
+      - "6831:6831/udp"
+      # Jaeger collector (optional)
+      - "14268:14268"
+      # Health check
+      - "14269:14269"
+    environment:
+      # Enable OTLP receiver
+      - COLLECTOR_OTLP_ENABLED=true
+      # Log level
+      - LOG_LEVEL=info
+    networks:
+      - madlen-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:14269/"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+networks:
+  madlen-network:
+    driver: bridge
