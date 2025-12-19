@@ -1,3 +1,30 @@
+## 📘 Bir Ön README (Özet)
+
+Bu sekmenin altında asıl profesyonel README bulunmaktadır. Bu bir case dolayısıyla yazılmış ön bilgi gibidir.
+Aşağıda README içinde bulunması yararlı olacak kısa başlıklar ve içeriklerin özeti yer almaktadır:
+
+- **Projenin kısa açıklaması**
+   - Madlen, OpenRouter ile entegre tam yığın bir sohbet uygulamasıdır. Backend Node.js/Express (TypeScript), frontend React/Vite (Ant Design) ile yazılmıştır. Uygulama metin ve görsel girdileri işleyebilir ve OpenTelemetry ile izlenebilir.
+
+- **Yaptığım teknik seçimler ve nedenleri**
+   - `Node.js` + `Express` (TypeScript): Express.js daha lightweight ve boilerplate'i Spring ya da Django'ya kıyasla daha minimal olduğu için mantıklı geldi. N-layered bir structure izledim ve de basit API'leri aslında OpenRouter API'lerine bağlamak gerektiği için sadece ve komplex serivice işlemleri olmadığı için bu proje adına HTTP library'leri daha kuvvetli olan Express.js'in doğru bir tercih olduğunu düşündüm. FastApi'nin de böyle basit bir Baclend için gereksiz fazla setupının olacağını düşündüm, bir mikroservis backendim olmayacaktı. Django'nun da kesin bir overkill olduğuna karar verdim. Typescript'in de türleri belirlemek açısından daha uygun olacağını düşündüm, ağır bir backend olmasa da bence backend'de Typescript kullanılmalı. :)
+   - `React` + `Vite` + `Ant Design`: Ant Design daha basit ofis tarzı tasarımlara sahip olduğu için, React daha öncesinde tecrübem olduğu için tercih ettim. Vite'ı hemen test edip istediğim gibi olmuş mu görebilmek için tercih ettim. Bir taslak oluşturup onu düzelterek ilerlemek bence Vite ile daha kolay oluyor. React'ı da muadillerine göre daha önde olduğunu düşündüğüm için ve de daha elim yatkın olduğu için tercih ettim. Neden JS değil de JSX, tabiki HTML type return'ler için. Neden TSX değil de JSX, burada aslında arada kaldım, öncelikle daha kısa ömürlü bir proje yani bir case olduğu için tercih ettim. Üstüne de biraz düşününce sadece Prompt'lara gelen cevapları veri tipi olarak kullanacağım için ya objeler tutacaktım ya da direkt stringleri kullanacaktım FrontEnd'de, bir type check ihtiyacım olmadığını düşündüm. JSX daha okunabilir geliyor bana ve de TSX'in o baştaki karmaşık yapısı olmazsa az sürede daha hızlı ilerleyebileceğimi düşündüm. Taslak üzerinden değişiklikler yapmak daha kolay oldu. Daha uzun vadeli veya daha komplex bir proje olsaydı kesinlikle TSX tercih ederdim.
+   - Controller/service ayrımı: Kodun test edilebilirliği ve bakım kolaylığı için daha mantıklı geldi, bir istek bir yerden girip aslında servisten başka bir API'ye (OpenRouter'a) gidecekti ve daha kompleks tasarımlar yerine N-layered bir tasarımın bunu çözeceğini düşündüm.
+
+- **Projeyi yerel makinede çalıştırmak için gerekli adımlar (kısa)**
+   1. Depoyu klonlayın: `git clone <repo>` ve `cd madlen-case-study`.
+   2. Hızlı kurulum için önerilen: `bash setup.sh` (macOS/Linux/Git Bash/WSL). Bu betik bağımlılıkları kurar, `backend/.env` için şablon bırakır ve (Docker çalışıyorsa) Jaeger'ı başlatır.
+   3. Manuel kurulum isterseniz: `cd backend && npm install && cd ../frontend && npm install`.
+   4. `backend/.env` içine `OPENROUTER_API_KEY` yerleştirin (README içinde örnekler mevcut).
+   5. Geliştirme modunda çalıştırmak için: `cd backend && npm run dev` ve ayrı bir terminalde `cd frontend && npm run dev`.
+
+- **Jaeger arayüzüne erişim ve trace'lerin görüntülenmesi**
+   - Jaeger'ı çalıştırmak için repository kökünde: `docker-compose up -d` (veya `bash setup.sh` docker yüklü ve çalışıyorsa otomatik başlatır).
+   - Tarayıcıda `http://localhost:16686` adresine gidin.
+   - Servis listesinde `madlen-backend` seçin ve `Find Traces` ile izleri görüntüleyin.
+   - Bir isteği tekrar üretip (ör. chat mesajı gönder) trace listesinde yeni kayıtların oluştuğunu kontrol edebilirsiniz.
+
+
 # Madlen Case Study - AI Chat Application
 
 A full-stack AI chat application with OpenRouter integration and distributed tracing using OpenTelemetry and Jaeger.
@@ -68,7 +95,6 @@ npm install
 ```
 
 ### 2. Configure Environment Variables
-
 > **Note:** If you used the setup script, template `.env` files are already created. Just add your OpenRouter API key.
 
 **Backend** (`backend/.env`):
@@ -91,6 +117,52 @@ OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318/v1/traces
 ```env
 VITE_API_URL=http://localhost:3000/api
 ```
+
+### Environment variables & API key (details)
+
+- **What is `OPENROUTER_API_KEY`?**
+   - This is the secret API key you get from OpenRouter (https://openrouter.ai/). It authorizes the backend to make requests to the OpenRouter service on your behalf.
+
+- **Where to put the key**
+   - Place the key in `backend/.env` as shown above. Do NOT commit `.env` to version control — it contains secrets.
+
+- **How to set the key temporarily (for testing)**
+   - Bash / Git Bash / WSL:
+      ```bash
+      export OPENROUTER_API_KEY="sk-...your-key-here..."
+      cd backend
+      npm run dev
+      ```
+   - PowerShell (temporary for current session):
+      ```powershell
+      $env:OPENROUTER_API_KEY = "sk-...your-key-here..."
+      cd backend
+      npm run dev
+      ```
+   - PowerShell (persist across sessions):
+      ```powershell
+      setx OPENROUTER_API_KEY "sk-...your-key-here..."
+      ```
+
+- **How to set the key permanently for the backend (using `.env`)**
+   - Create (or edit) `backend/.env` and add:
+      ```env
+      OPENROUTER_API_KEY=sk-...your-key-here...
+      ```
+   - After changing `.env`, restart the backend dev server so the new values are loaded.
+
+- **Frontend note**
+   - The frontend uses `VITE_API_URL` to contact the backend. The frontend should not hold your OpenRouter API key directly — the backend proxies requests to OpenRouter to keep the key secret.
+
+- **Security & usage tips**
+   - Never commit API keys to Git. Add `.env` to `.gitignore` (the repo template already does this).
+   - If the key is compromised, rotate it from OpenRouter and update `backend/.env`.
+   - Be mindful of rate limits and billing on your OpenRouter account — test with low-volume requests first.
+
+- **Troubleshooting**
+   - If requests to the AI backend fail with auth errors, confirm `OPENROUTER_API_KEY` is set and that the backend process has been restarted after changes.
+   - If you run the `setup.sh` script, it places a `.env` template in `backend/` — you still need to paste your key into that file.
+
 
 ### 3. Start Jaeger (Tracing)
 
