@@ -109,6 +109,10 @@
   text-align: center;
 }
 
+.conversation-icon {
+  max-width: 20px;
+}
+
 .sidebar-footer {
   padding: 8px 0;
   border-top: 1px solid #2d2d2d;

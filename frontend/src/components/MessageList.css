@@ -74,6 +74,7 @@
 
 .message-assistant .message-body {
   align-items: flex-start;
+  justify-content: center;
 }
 
 .message-user .message-content {
@@ -87,7 +88,7 @@
 .message-assistant .message-content {
   background: transparent;
   border: none;
-  padding: 0;
+  padding-top: 8px;
 }
 
 .message-system .message-content {

@@ -1,0 +1,76 @@
+.code-block {
+  background: #1e1e1e;
+  border: 1px solid #3c4043;
+  border-radius: 8px;
+  margin: 12px 0;
+  overflow: hidden;
+}
+
+.code-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #2d2d2d;
+  border-bottom: 1px solid #3c4043;
+}
+
+.code-language {
+  color: #9aa0a6;
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.copy-btn {
+  color: #9aa0a6 !important;
+}
+
+.copy-btn:hover {
+  color: #8ab4f8 !important;
+  background: #3c4043 !important;
+}
+
+.code-content {
+  padding: 16px;
+  margin: 0;
+  overflow-x: auto;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #e8eaed;
+  background: #1e1e1e;
+}
+
+.code-content code {
+  color: #e8eaed;
+  font-family: inherit;
+  white-space: pre;
+}
+
+/* Basic syntax highlighting for common patterns */
+.code-content code::before {
+  content: '';
+}
+
+/* Keywords */
+.code-content:has(.language-python) code {
+  color: #e8eaed;
+}
+
+.code-content::-webkit-scrollbar {
+  height: 8px;
+}
+
+.code-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.code-content::-webkit-scrollbar-thumb {
+  background: #3c4043;
+  border-radius: 4px;
+}
+
+.code-content::-webkit-scrollbar-thumb:hover {
+  background: #5f6368;
+}

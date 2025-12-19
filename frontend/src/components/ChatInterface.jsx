@@ -130,6 +130,14 @@ function ChatInterface() {
     }
   };
 
+  const handleStreamingComplete = (messageIndex) => {
+    setMessages((prev) => 
+      prev.map((msg, idx) => 
+        idx === messageIndex ? { ...msg, isStreaming: false } : msg
+      )
+    );
+  };
+
   return (
     <div className="app-container">
       {sidebarVisible && (
@@ -162,7 +170,11 @@ function ChatInterface() {
               <Title level={4} className="welcome-subtitle">Nereden başlayalım?</Title>
             </div>
           ) : (
-            <MessageList messages={messages} loading={loading} />
+            <MessageList 
+              messages={messages} 
+              loading={loading}
+              onStreamingComplete={handleStreamingComplete}
+            />
           )}
         </Content>
         <Footer className="chat-footer">

@@ -47,7 +47,7 @@ function Sidebar({ onNewChat, conversations, currentConversationId, onSwitchConv
                 className={`conversation-item ${conv.id === currentConversationId ? 'selected' : ''}`}
                 onClick={() => onSwitchConversation(conv.id)}
               >
-                <ClockCircleOutlined />
+                <ClockCircleOutlined className="conversation-icon"/>
                 <span>{getConversationTitle(conv)}</span>
               </div>
             ))

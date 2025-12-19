@@ -20,13 +20,19 @@ router.post(
  * GET /api/models
  * Get list of available models
  */
-router.get('/models', chatController.getModels);
+router.get(
+  '/models', 
+  chatController.getModels
+);
 
 /**
  * GET /api/conversations
  * List conversation metadata
  */
-router.get('/conversations', chatController.getConversations);
+router.get(
+  '/conversations', 
+  chatController.getConversations
+);
 
 /**
  * GET /api/conversations/:id

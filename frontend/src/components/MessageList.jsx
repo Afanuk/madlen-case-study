@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { List, Avatar, Spin, Image } from 'antd';
 import StreamingText from './StreamingText';
+import MarkdownRenderer from './MarkdownRenderer';
 import './MessageList.css';
 
-function MessageList({ messages, loading }) {
+function MessageList({ messages, loading, onStreamingComplete }) {
   const containerRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -54,7 +55,14 @@ function MessageList({ messages, loading }) {
                       <StreamingText 
                         text={message.fullContent || message.content} 
                         delay={5}
+                        onComplete={() => {
+                          if (onStreamingComplete) {
+                            onStreamingComplete(index);
+                          }
+                        }}
                       />
+                    ) : message.role === 'assistant' ? (
+                      <MarkdownRenderer content={message.content} />
                     ) : (
                       message.content
                     )}
