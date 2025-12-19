@@ -89,21 +89,33 @@ cd frontend
 npm install
 cd ..
 
-# Check Docker (optional)
+# Check Docker and start Jaeger
+DOCKER_AVAILABLE=false
 if command -v docker &> /dev/null; then
     echo "✅ Docker detected (for Jaeger tracing)"
     
     # Check if Docker is running
     if docker info &> /dev/null; then
         echo "✅ Docker daemon is running"
+        DOCKER_AVAILABLE=true
+        
+        # Start Jaeger with docker-compose
+        echo "🐳 Starting Jaeger container..."
+        if docker-compose up -d; then
+            echo "✅ Jaeger started successfully"
+            echo "   Jaeger UI: http://localhost:16686"
+        else
+            echo "⚠️  Failed to start Jaeger. You can start it manually with: docker-compose up -d"
+        fi
     else
         echo "⚠️  Docker is installed but not running"
         if [[ "$OS" == "macOS" ]]; then
-            echo "   Start Docker Desktop from Applications"
+            echo "   Start Docker Desktop from Applications, then run: docker-compose up -d"
         elif [[ "$OS" == "Windows" ]]; then
-            echo "   Start Docker Desktop"
+            echo "   Start Docker Desktop, then run: docker-compose up -d"
         else
             echo "   Start Docker: sudo systemctl start docker"
+            echo "   Then run: docker-compose up -d"
         fi
     fi
 else
@@ -124,7 +136,9 @@ echo "📝 Next steps:"
 echo "   1. Add your OPENROUTER_API_KEY to backend/.env"
 echo "   2. Start backend: cd backend && npm run dev"
 echo "   3. Start frontend: cd frontend && npm run dev"
-echo "   4. (Optional) Start Jaeger: docker-compose up"
+if [ "$DOCKER_AVAILABLE" = false ]; then
+    echo "   4. Install and start Docker, then run: docker-compose up -d"
+fi
 echo ""
 echo "🎯 Platform-specific tips:"
 if [[ "$OS" == "macOS" ]]; then
