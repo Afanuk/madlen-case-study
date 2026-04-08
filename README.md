@@ -4,7 +4,7 @@ Bu sekmenin altında asıl profesyonel README bulunmaktadır. Bu bir case dolay�
 Aşağıda README içinde bulunması yararlı olacak kısa başlıklar ve içeriklerin özeti yer almaktadır:
 
 - **Projenin kısa açıklaması**
-   - Madlen, OpenRouter ile entegre tam yığın bir sohbet uygulamasıdır. Backend Node.js/Express (TypeScript), frontend React/Vite (Ant Design) ile yazılmıştır. Uygulama metin ve görsel girdileri işleyebilir ve OpenTelemetry ile izlenebilir.
+   - OpenRouter ile entegre tam yığın bir sohbet uygulamasıdır. Backend Node.js/Express (TypeScript), frontend React/Vite (Ant Design) ile yazılmıştır. Uygulama metin ve görsel girdileri işleyebilir ve OpenTelemetry ile izlenebilir.
 
 - **Yaptığım teknik seçimler ve nedenleri**
    - `Node.js` + `Express` (TypeScript): Express.js daha lightweight ve boilerplate'i Spring ya da Django'ya kıyasla daha minimal olduğu için mantıklı geldi. N-layered bir structure izledim ve de basit API'leri aslında OpenRouter API'lerine bağlamak gerektiği için sadece ve komplex serivice işlemleri olmadığı için bu proje adına HTTP library'leri daha kuvvetli olan Express.js'in doğru bir tercih olduğunu düşündüm. FastApi'nin de böyle basit bir Baclend için gereksiz fazla setupının olacağını düşündüm, bir mikroservis backendim olmayacaktı. Django'nun da kesin bir overkill olduğuna karar verdim. Typescript'in de türleri belirlemek açısından daha uygun olacağını düşündüm, ağır bir backend olmasa da bence backend'de Typescript kullanılmalı. :)
@@ -25,7 +25,7 @@ Aşağıda README içinde bulunması yararlı olacak kısa başlıklar ve içeri
    - Bir isteği tekrar üretip (ör. chat mesajı gönder) trace listesinde yeni kayıtların oluştuğunu kontrol edebilirsiniz.
 
 
-# Madlen Case Study - AI Chat Application
+# Case Study - AI Chat Application
 
 A full-stack AI chat application with OpenRouter integration and distributed tracing using OpenTelemetry and Jaeger.
 
